@@ -1,7 +1,7 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
-  const FormDevice = sequelize.define(
-    "FormDevice",
+  const FormDevices= sequelize.define(
+    "FormDevices",
     {
       status: DataTypes.STRING,
       formId: DataTypes.INTEGER,
@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {}
   );
-  FormDevice.associate = function(models) {
+  FormDevices.associate = function(models) {
     // associations can be defined here
   };
-  return FormDevice;
+  return FormDevices;
 };

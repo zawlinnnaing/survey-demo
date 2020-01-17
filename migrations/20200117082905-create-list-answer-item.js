@@ -1,46 +1,37 @@
 "use strict";
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable("FormDevices", {
+    return queryInterface.createTable("ListAnswerItems", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      formId: {
+
+      // Foreign Keys
+      listAnswerId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Forms",
+          model: "ListAnswers",
           key: "id"
         },
-        onUpdate: "cascade",
-        onDelete: "cascade"
+        onDelete: "cascade",
+        onUpdate: "cascade"
       },
-      deviceId: {
+      listItemId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Devices",
+          model: "ListItems",
           key: "id"
         },
-        onUpdate: "cascade",
-        onDelete: "cascade"
+        onDelete: "cascade",
+        onUpdate: "cascade"
       },
-      // formId: {
-      //   type: Sequelize.INTEGER,
-      //   primaryKey: true,
-      //   allowNull: false
-      // },
-      // deviceId: {
-      //   type: Sequelize.INTEGER,
-      //   allowNull: false,
-      //   primaryKey: true
-      // },
-      status: {
-        type: Sequelize.STRING
-      },
+      // End Foreign keys
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -52,6 +43,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("FormDevices");
+    return queryInterface.dropTable("ListAnswerItems");
   }
 };

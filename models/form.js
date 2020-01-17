@@ -15,7 +15,17 @@ module.exports = (sequelize, DataTypes) => {
     Form.belongsToMany(models.Device, {
       through: "FormDevices",
       as: "Devices",
-      foreignKey: "formId"
+      foreignKey: "formId",
+      onDelete: "cascade",
+      hooks: true
+    });
+    Form.hasMany(models.TextQuestion, {
+      foreignKey: "formId",
+      onDelete: "cascade"
+    });
+    Form.hasMany(models.ListQuestion, {
+      foreignKey: "formId",
+      onDelete: "cascade"
     });
   };
   return Form;

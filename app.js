@@ -9,6 +9,7 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var formRouter = require("./routes/forms");
+var deviceRouter = require("./routes/devices");
 
 var app = express();
 var storeOptions = {
@@ -49,6 +50,13 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/forms", formRouter);
+app.use("/devices", deviceRouter);
+
+//Test routes
+app.post("/test-json", (req, res, next) => {
+  let json_body = req.body.test_json;
+  res.status(200).json(json_body);
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
