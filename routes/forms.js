@@ -2,6 +2,7 @@ let express = require("express");
 let models = require("../models");
 let { listQuestionsTypes, textQuestionTypes } = require("../config/app");
 let router = express.Router();
+const { Op } = require("sequelize");
 
 router.get("/", (req, res, next) => {
   res.render("forms/index", { title: "Create a form" });
@@ -27,24 +28,6 @@ router.post("/", (req, res, next) => {
     }
   )
     .then(form => {
-      models.Device.findOrCreate({
-        where: {
-          sessionId: req.session.id
-        }
-      })
-        .then(([device, created]) => {
-          form.addDevice(device, {
-            through: {
-              status: "active"
-            }
-          });
-        })
-        .catch(err => {
-          console.error(err);
-          res.status(500).json({
-            error: err
-          });
-        });
       // questions.forEach(element => {
       //   console.log(element.items);
       //   form
@@ -100,33 +83,33 @@ router.delete("/:formId", (req, res, next) => {
     });
 });
 
-router.post("/:formId/text-questions", (req, res, next) => {
-  models.Form.findOne({
-    where: {
-      id: req.params.formId
-    }
-  })
-    .then(form => {
-      form
-        .createTextQuestion({
-          question: req.body.question,
-          type: req.body.questionType,
-          required: Boolean(req.body.required),
-          order: req.body.order
-        })
-        .then(() => {
-          res.status(200).json({
-            message: "Text question created successfully."
-          });
-        });
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({
-        error: err
-      });
-    });
-});
+// router.post("/:formId/text-questions", (req, res, next) => {
+//   models.Form.findOne({
+//     where: {
+//       id: req.params.formId
+//     }
+//   })
+//     .then(form => {
+//       form
+//         .createTextQuestion({
+//           question: req.body.question,
+//           type: req.body.questionType,
+//           required: Boolean(req.body.required),
+//           order: req.body.order
+//         })
+//         .then(() => {
+//           res.status(200).json({
+//             message: "Text question created successfully."
+//           });
+//         });
+//     })
+//     .catch(err => {
+//       console.error(err);
+//       res.status(500).json({
+//         error: err
+//       });
+//     });
+// });
 
 router.post("/:formId/answers", (req, res, next) => {
   let data = req.body;
@@ -134,13 +117,47 @@ router.post("/:formId/answers", (req, res, next) => {
     where: {
       id: req.params.formId
     },
-    include: {
-      model: models.Question,
-      as: "questions",
-      order: [models.Question, "order", "desc"]
-    }
+    include: [
+      {
+        model: models.Device,
+        as: "Devices",
+        required: false,
+        attributes: ["sessionId"]
+      },
+      {
+        model: models.Question,
+        as: "questions",
+        order: [models.Question, "order", "desc"]
+      }
+    ]
   })
     .then(form => {
+      form.Devices.forEach(device => {
+        
+        if (String(device.sessionId) == String(req.session.id)) {
+          res.status(422).json({
+            error: "You have already answered this survey"
+          });
+        }
+      });
+      models.Device.findOrCreate({
+        where: {
+          sessionId: req.session.id
+        }
+      })
+        .then(([device, created]) => {
+          form.addDevice(device, {
+            through: {
+              status: "completed"
+            }
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).json({
+            error: err
+          });
+        });
       let questionIds = data.map(ele => {
         return ele.questionId;
       });
@@ -216,7 +233,7 @@ router.post("/:formId/answers", (req, res, next) => {
     .catch(err => {
       console.error(err);
       res.status(422).json({
-        error: "Form finding failed"
+        error: "Form finding failed "
       });
     });
 });
