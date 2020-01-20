@@ -100,7 +100,6 @@ function retriveTextQuestion(questionId) {
   );
   obj.type = questionTypeValue;
   obj.order = questionId;
-  obj.textOrList = "text";
   return obj;
 }
 

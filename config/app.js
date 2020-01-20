@@ -1,4 +1,5 @@
 module.exports = {
-  listQuestionsTypes: ["mutliple", "dropdown", "checkbox"],
+  listQuestionsTypes: ["radio", "dropdown", "checkbox"],
+  textQuestionTypes: ["short", "long"],
   formDeviceStatus: ["completed", "pending"]
 };
