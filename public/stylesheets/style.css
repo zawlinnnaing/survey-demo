@@ -4,5 +4,75 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  color: #00b7ff;
+}
+
+h1.form-title {
+  color: #2196f3;
+}
+
+input.form-input {
+  width: 15rem;
+  height: 2rem;
+  padding: 0.5rem 2rem;
+}
+
+textarea.form-textarea {
+  padding: 0.5rem 2rem;
+}
+
+.form-text {
+  color: grey;
+}
+
+button {
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: #2196f3 !important;
+}
+
+/* Question builder */
+
+.question-footer {
+  color: #f44336;
+  padding: 1rem 2rem;
+}
+
+div.individual-question {
+  padding: 2rem;
+  margin: 2rem 1rem;
+}
+
+div#questions-div {
+  padding: 4rem;
+}
+
+button#save-form-btn {
+  margin: 0rem 2rem;
+}
+
+/* Checkbox question modal */
+
+div.checkbox-option-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+div.checkbox-option-field > * {
+  margin: 0 1rem;
+}
+
+div.checkbox-option-field > p {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+div.checkbox-contents > div.btn-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin: 0 2rem;
 }

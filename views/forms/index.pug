@@ -1,0 +1,33 @@
+extends ../layout
+block content
+    include ../modals/short_question
+    include ../modals/checkbox_question
+    h1(class="form-title") Create a survey form
+    form(id="create-form",action="/forms",method="POST")
+        div
+            h4(class="form-text") Form title
+            input#form-title(type='text' name="title"  class="form-input" required)
+        div
+            h4(class='form-text') Description
+            textarea#form-description(name="description", class='form-textarea' cols="100", rows="15")
+
+    hr
+    div(class="dropdown")
+        button(class="btn btn-secondary dropdown-toggle" style={"background-color": "#2196f3"} type="button" id="create-question-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") Create Question
+        div(class="dropdown-menu" aria-labelledby="dropdownMenuButton")
+            button(class="dropdown-item" id="create-short-question" data-toggle="modal" data-target="#shortQuestionModal") Text Question
+            hr
+            button(class="dropdown-item" id="create-checkbox-question" data-toggle="modal" data-target="#checkBoxQuestionModal") Check box Question
+            button(class="dropdown-item" id="create-dropdown-question") Drop Down Question
+            button(class="dropdown-item" id="create-radio-question") Radio Button
+
+    div#questions-div(class="questions")
+    div#questions-btns(class="questions")
+        div(class= "btn-group" role="group")
+            button#save-form-btn(type="button" class="btn btn-primary") Save
+            button#cancel-form-btn(type="button" class="btn btn-secondary") Cancel
+
+
+block script
+    script(src="/javascripts/forms/index.js" defered)
+    script(src="/javascripts/forms/list-questions.js" defered)

@@ -1,9 +1,19 @@
 let express = require("express");
 let models = require("../models");
 let router = express.Router();
+
+router.get("/", (req, res, next) => {
+  res.render("forms/index", { title: "Create a form" });
+});
 router.post("/", (req, res, next) => {
+  let data = req.body;
+  let questions = req.body.questions;
+
+  questions.reduce()
+
   models.Form.create({
-    title: "Testing relationship"
+    title: data.title,
+    description: data.description
   })
     .then(form => {
       models.Device.findOne({
@@ -11,7 +21,6 @@ router.post("/", (req, res, next) => {
           sessionId: req.session.id
         }
       }).then(device => {
-        console.log(device);
         form.addDevice(device, {
           through: {
             status: "active"

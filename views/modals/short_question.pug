@@ -1,0 +1,26 @@
+div(class="modal" tabindex="-1" role="dialog" id="shortQuestionModal")
+    div(class="modal-dialog" role="document")
+        div(class="modal-content")
+            div(class="modal-header")
+                h5(class="modal-title") Text Question
+                button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+                    span(aria-hidden="true") &times;
+            div(class="modal-body")
+                div(class="form-group")
+                    p Question
+                    input#question-text(type="text", name="QuestionText" class="form-control" required)
+                div(class="form-check")
+                    input#question-required(type="checkbox", class = "form-check-input", value="1",name="QuestionRequired")
+                    label(for="question-required", class="form-check-label") Required
+
+                hr
+                div(class='form-check')
+                    input#question-type-short(type="radio",value="short",name="question-type",class="form-check-input", checked)
+                    label(for="question-type" class="form-check-label") Short Answer
+                div(class='form-check')
+                    input#question-type-long(type="radio",value="long",name="question-type",class="form-check-input")
+                    label(for="question-type" class="form-check-label") Long Answer
+
+            div(class="modal-footer")
+                button#create-text-question(type='button',class="btn btn-primary") Create Question 
+                button(type="button", class="btn btn-secondary" data-dismiss="modal") Cancel
