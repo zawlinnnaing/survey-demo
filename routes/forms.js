@@ -147,12 +147,14 @@ router.put("/:formId", (req, res, next) => {
 //     });
 // });
 
-router.post("/:formId/answers", (req, res, next) => {
+router.post("/:formId/answers", async (req, res, next) => {
   let data = req.body;
+  let t = await models.sequelize.transaction();
   models.Form.findOne({
     where: {
       id: req.params.formId
     },
+    transaction: t,
     include: [
       {
         model: models.Device,
@@ -181,7 +183,8 @@ router.post("/:formId/answers", (req, res, next) => {
       models.Device.findOrCreate({
         where: {
           sessionId: req.session.id
-        }
+        },
+        transaction: t
       })
         .then(([device, created]) => {
           form.addDevice(device, {
@@ -244,19 +247,27 @@ router.post("/:formId/answers", (req, res, next) => {
               textQuestionTypes.includes(question.type) &&
               element.textAnswer != ""
             ) {
-              question.createAnswer({
-                answer: element.textAnswer
-              });
+              question.createAnswer(
+                {
+                  answer: element.textAnswer
+                },
+                {
+                  transaction: t
+                }
+              );
             }
             if (
               listQuestionsTypes.includes(question.type) &&
               element.listAnswers.length >= 0
             ) {
               question
-                .createListAnswer({
-                  createdAt: new Date(),
-                  updateAt: new Date()
-                })
+                .createListAnswer(
+                  {
+                    createdAt: new Date(),
+                    updateAt: new Date()
+                  },
+                  { transaction: t }
+                )
                 .then(listAnswerModel => {
                   element.listAnswers.forEach(ele => {
                     models.ListItem.findOne({
@@ -286,7 +297,6 @@ router.post("/:formId/answers", (req, res, next) => {
       });
     })
     .catch(err => {
-      next(err);
       res.status(422).json({
         error: err.message
       });
