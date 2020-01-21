@@ -192,35 +192,24 @@ router.post("/:formId/answers", (req, res, next) => {
         })
         .catch(err => {
           console.error(err);
-          // res.status(500).json({
-          //   error: err
-          // });
-          next(err);
+          throw new Error(err.message);
         });
       let questionIds = data.map(ele => {
         return ele.questionId;
       });
-      // console.log("Question ids from request", questionIds);
-      // console.log(
-      //   "questions id from database",
-      //   form.questions.map(element => element.id)
-      // );
       if (
         JSON.stringify(questionIds) !==
         JSON.stringify(form.questions.map(ele => ele.id))
       ) {
         throw new Error("Invalid question contained");
-        res.status(403).json({
-          error: "Invalid questions contained."
-        });
       }
-      data
-        .forEach(element => {
-          models.Question.findOne({
-            where: {
-              id: element.questionId
-            }
-          }).then(question => {
+      data.forEach(element => {
+        models.Question.findOne({
+          where: {
+            id: element.questionId
+          }
+        })
+          .then(question => {
             console.log(
               "is list question ? ",
               listQuestionsTypes.includes(question.type),
@@ -287,12 +276,11 @@ router.post("/:formId/answers", (req, res, next) => {
                   throw new Error(err.message);
                 });
             }
+          })
+          .catch(err => {
+            throw new Error(err.message);
           });
-        })
-        .catch(err => {
-          next(err);
-        });
-
+      });
       res.status(200).json({
         msg: "Answers submitted successfully"
       });
