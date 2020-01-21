@@ -16,14 +16,15 @@ textQuestion.onclick = event => {
   createShortQuestion(
     questionObj.question,
     questionObj.required,
-    questionObj.type
+    questionObj.type,
+    questionObj.order
   );
   questions.push(questionObj);
   clearTextQuestion();
   $("#shortQuestionModal").modal("hide");
 };
 
-function createShortQuestion(title, isRequired, questionType) {
+function createShortQuestion(title, isRequired, questionType, questionId) {
   let topLevelElement = document.createElement("div");
   topLevelElement.setAttribute("class", "individual-question card");
 
@@ -56,7 +57,7 @@ function createShortQuestion(title, isRequired, questionType) {
     });
     questionBody.appendChild(questionAnswer); // questionBody > questionAnswer
   }
-  topLevelElement.appendChild(questionBody); //topLevelElement > questionBody
+  topLevelElement.appendChild(questionBody); //topLevelElement > questionBody > questionAnswer
 
   if (isRequired) {
     let questionFooter = document.createElement("div");
@@ -64,7 +65,15 @@ function createShortQuestion(title, isRequired, questionType) {
       class: "question-footer"
     });
     questionFooter.innerText = "* Required";
-    topLevelElement.appendChild(questionFooter);
+    let deleteBtn = document.createElement("button"); // questionFooter > deleteBtn
+    setAttributes(deleteBtn, {
+      class: "btn btn-delete delete-question-btn",
+      data_question_id: questionId,
+      onclick: "deleteQuestion(this)"
+    });
+    deleteBtn.innerText = "Delete";
+    questionFooter.appendChild(deleteBtn);
+    topLevelElement.appendChild(questionFooter); // topLevelElement > questionFooter > deleteBtn
   }
   questionsDiv.appendChild(topLevelElement);
 }
@@ -87,8 +96,9 @@ function retriveFormData() {
 function retriveTextQuestion(questionId) {
   let obj = {};
   let questionTextValue = document.getElementById("question-text").value;
-  if (questionTextValue == null) {
+  if (questionTextValue == "") {
     alert("Question must not be empty");
+    throw new Error("empty question");
   } else {
     obj.question = questionTextValue;
   }
@@ -115,4 +125,56 @@ function getRadioBtnValue(element) {
       return element[i].value;
     }
   }
+}
+
+function deleteQuestion(element) {
+  element = $(element);
+  removeQuestion(questions, element.data("question-id"));
+  element
+    .parent()
+    .parent()
+    .remove();
+}
+
+function removeQuestion(questions, questionId) {
+  questions.splice(
+    questions.findIndex(obj => obj.order == questionId),
+    1
+  );
+}
+
+// List questions
+
+$("#create-list-question").on("click", event => {
+  let listQuestionObj = retriveListQuetion();
+  console.log(listQuestionObj);
+});
+
+function retriveListQuetion() {
+  let obj = {};
+  // console.log(""$("#checkbox-question-text"));
+  let questionText = $("#checkbox-question-text").val();
+  if (questionText == "" || questionText == null) {
+    alert("Question text is required.");
+    throw new Error("question text required");
+  } else {
+    obj.question = questionText;
+  }
+  let questionRequired = $("#checkbox-question-required").val();
+  obj.required = questionRequired ? 1 : 0;
+  obj.type = getRadioBtnValue(document.getElementsByName("listQuestionType"));
+  let items = [];
+  let checkboxOptions = $("input[name='checkbox-option']");
+  console.log(checkboxOptions);
+  for (let i = 0; i < checkboxOptions.length; i++) {
+    items.push({
+      itemName: $(checkboxOptions[i]).val()
+    });
+  }
+  obj.listItems = items;
+  return obj;
+}
+
+function createListQuestion(question, type, required, options) {
+  
 }

@@ -5,7 +5,11 @@ module.exports = (sequelize, DataTypes) => {
     {
       listQuestionId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        validate: {
+          insInt: true,
+          min: 1
+        }
       }
     },
     {}

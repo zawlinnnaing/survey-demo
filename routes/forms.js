@@ -83,6 +83,42 @@ router.delete("/:formId", (req, res, next) => {
     });
 });
 
+router.put("/:formId", (req, res, next) => {
+  let data = req.body;
+  let id = req.params.formId;
+  models.Form.findOne({
+    where: {
+      id: req.params.formId
+    },
+    include: [
+      {
+        model: models.Question,
+        as: "questions",
+        include: {
+          model: models.ListItem,
+          as: "listItems"
+        }
+      }
+    ]
+  })
+    .then(form => {
+      form.title = data.title;
+      form.description = data.description;
+      form.save();
+      // let questionIds =
+      data.questions.forEach(element => {
+        form.questions.update(element);
+      });
+      res.end();
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(422).json({
+        error: err.message
+      });
+    });
+});
+
 // router.post("/:formId/text-questions", (req, res, next) => {
 //   models.Form.findOne({
 //     where: {
@@ -123,6 +159,11 @@ router.post("/:formId/answers", (req, res, next) => {
         as: "Devices",
         required: false,
         attributes: ["sessionId"]
+        // where: {
+        //   sessionId: {
+        //     [Op.eq]: String(req.session.id)
+        //   }
+        // }
       },
       {
         model: models.Question,
@@ -133,11 +174,8 @@ router.post("/:formId/answers", (req, res, next) => {
   })
     .then(form => {
       form.Devices.forEach(device => {
-        
         if (String(device.sessionId) == String(req.session.id)) {
-          res.status(422).json({
-            error: "You have already answered this survey"
-          });
+          throw new Error("Survey already submitted.");
         }
       });
       models.Device.findOrCreate({
@@ -154,86 +192,115 @@ router.post("/:formId/answers", (req, res, next) => {
         })
         .catch(err => {
           console.error(err);
-          res.status(500).json({
-            error: err
-          });
+          // res.status(500).json({
+          //   error: err
+          // });
+          next(err);
         });
       let questionIds = data.map(ele => {
         return ele.questionId;
       });
-      console.log("Question ids from request", questionIds);
-      console.log(
-        "questions id from database",
-        form.questions.map(element => element.id)
-      );
+      // console.log("Question ids from request", questionIds);
+      // console.log(
+      //   "questions id from database",
+      //   form.questions.map(element => element.id)
+      // );
       if (
         JSON.stringify(questionIds) !==
         JSON.stringify(form.questions.map(ele => ele.id))
       ) {
+        throw new Error("Invalid question contained");
         res.status(403).json({
           error: "Invalid questions contained."
         });
       }
-      data.forEach(element => {
-        models.Question.findOne({
-          where: {
-            id: element.questionId
-          }
-        }).then(question => {
-          if (question.required) {
+      data
+        .forEach(element => {
+          models.Question.findOne({
+            where: {
+              id: element.questionId
+            }
+          }).then(question => {
+            console.log(
+              "is list question ? ",
+              listQuestionsTypes.includes(question.type),
+              " No List answers",
+              element.listAnswers == undefined ||
+                element.listAnswers == null ||
+                element.listAnswers.length <= 0,
+              "Question id",
+              element.questionId
+            );
+            if (question.required) {
+              if (
+                textQuestionTypes.includes(question.type) &&
+                (element.textAnswer == undefined ||
+                  element.textAnswer == null ||
+                  element.textAnswer == "")
+              ) {
+                // res.status(403).json("Invalid answer");
+                console.log("In text answer invalid");
+                throw new Error("Invalid Text answer");
+              } else if (
+                listQuestionsTypes.includes(question.type) &&
+                (element.listAnswers == undefined ||
+                  element.listAnswers == null ||
+                  element.listAnswers.length <= 0)
+              ) {
+                console.log("in list answers invalid");
+                throw new Error("Invalid List answers");
+              }
+            }
             if (
               textQuestionTypes.includes(question.type) &&
-              !element.textAnswer &&
-              element.textAnswer == ""
+              element.textAnswer != ""
             ) {
-              res.status(403).json("Invalid answer");
-            } else if (
-              listQuestionsTypes.includes(question.type) &&
-              !element.listAnswers &&
-              element.listAnswers.length <= 0
-            ) {
-              res.status(403).json("Invalid answer");
-            }
-          }
-          if (
-            textQuestionTypes.includes(question.type) &&
-            element.textAnswer != ""
-          ) {
-            question.createAnswer({
-              answer: element.textAnswer
-            });
-          }
-          if (
-            listQuestionsTypes.includes(question.type) &&
-            element.listAnswers.length >= 0
-          ) {
-            question
-              .createListAnswer({
-                createdAt: new Date(),
-                updateAt: new Date()
-              })
-              .then(listAnswerModel => {
-                element.listAnswers.forEach(ele => {
-                  models.ListItem.findOne({
-                    where: {
-                      id: ele.listItemId
-                    }
-                  }).then(listItem => {
-                    listAnswerModel.addItem(listItem);
-                  });
-                });
+              question.createAnswer({
+                answer: element.textAnswer
               });
-          }
+            }
+            if (
+              listQuestionsTypes.includes(question.type) &&
+              element.listAnswers.length >= 0
+            ) {
+              question
+                .createListAnswer({
+                  createdAt: new Date(),
+                  updateAt: new Date()
+                })
+                .then(listAnswerModel => {
+                  element.listAnswers.forEach(ele => {
+                    models.ListItem.findOne({
+                      where: {
+                        id: ele.listItemId
+                      }
+                    })
+                      .then(listItem => {
+                        listAnswerModel.addItem(listItem);
+                      })
+                      .catch(err => {
+                        throw new Error(err.message);
+                      });
+                  });
+                })
+                .catch(err => {
+                  throw new Error(err.message);
+                });
+            }
+          });
+        })
+        .catch(err => {
+          next(err);
         });
-      });
+
       res.status(200).json({
         msg: "Answers submitted successfully"
       });
     })
     .catch(err => {
-      console.error(err);
+      next(err);
       res.status(422).json({
-        error: "Form finding failed "
+        error: err.message
       });
     });
 });

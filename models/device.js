@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       sessionId: {
         type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true
+        },
         isUnique: true
       },
       createdAt: DataTypes.DATE,

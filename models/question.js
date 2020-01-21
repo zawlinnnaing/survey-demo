@@ -3,14 +3,22 @@ module.exports = (sequelize, DataTypes) => {
   const Question = sequelize.define(
     "Question",
     {
-      question: DataTypes.STRING,
+      question: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: true,
+          notEmpty: true
+        }
+      },
       type: DataTypes.ENUM("short", "long", "checkbox", "dropdown", "radio"),
       required: DataTypes.BOOLEAN,
       formId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-          isInt: true
+          isInt: true,
+          min: 1
         }
       },
       order: {

@@ -3,8 +3,26 @@ module.exports = (sequelize, DataTypes) => {
   const TextAnswer = sequelize.define(
     "TextAnswer",
     {
-      answer: DataTypes.TEXT,
-      questionId: DataTypes.INTEGER
+      answer: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          isLength: {
+            min: 5,
+            max: 500
+          }
+        }
+      },
+      questionId: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        validate: {
+          isInt: true,
+          min: 1,
+          notNull: true
+        }
+      }
     },
     {}
   );

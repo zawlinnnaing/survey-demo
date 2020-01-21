@@ -1,0 +1,38 @@
+div(class="modal" tabindex="-1" role="dialog" id="checkBoxQuestionModal")
+    div(class="modal-dialog" role="document")
+        div(class="modal-content")
+            div(class="modal-header")
+                h5(class="modal-title") Check box Question
+                button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+                    span(aria-hidden="true") &times;
+            div(class="modal-body")
+                div(class="form-group")
+                    p Question
+                    input#checkbox-question-text(type="text", name="QuestionText" class="form-control" required)
+                div(class="form-check")
+                    input#checkbox-question-required(type="checkbox", class = "form-check-input", value="1",name="QuestionRequired", checked)
+                    label(for="question-required", class="form-check-label") Required
+                hr
+                p Question Type
+                div(class="form-check form-check-inline")
+                    input#checkbox-radio(type="radio" class= "form-check-input", value="checkbox", name="listQuestionType", checked)
+                    label(for="checkbox-radio" class="form-check-label") Checkbox
+                div(class="form-check form-check-inline")
+                    input#radio-radio(type="radio" class= "form-check-input", value="radio", name="listQuestionType")
+                    label(for="radio-radio" class="form-check-label") Radio
+                div(class="form-check form-check-inline")
+                    input#dropdown-radio(type="radio" class= "form-check-input", value="dropdown", name="listQuestionType")
+                    label(for="dropdown-radio" class="form-check-label") Dropdown
+                hr
+                div(class = "checkbox-contents")
+                    //- div(class="btn-container")
+                    //-     button(type="button" class="add-checkbox-btn btn btn-secondary") Add another option
+                    div(class="form-group checkbox-option-field")
+                        p
+                            i(class="far fa-square")
+                        input(type="text" name="checkbox-option", class="form-control" value="option 1")
+                        button(class="add-checkbox-btn btn btn-secondary") Add
+
+            div(class="modal-footer")
+                button#create-list-question(type='button',class="btn btn-primary") Create Question 
+                button(type="button", class="btn btn-secondary" data-dismiss="modal") Cancel

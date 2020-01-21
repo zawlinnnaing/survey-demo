@@ -5,7 +5,14 @@ module.exports = (sequelize, DataTypes) => {
     {
       itemName: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          isLength: {
+            min: 2,
+            max: 200
+          }
+        }
       },
       order: {
         type: DataTypes.INTEGER,
@@ -16,7 +23,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       listQuestionId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        validate: {
+          isInt: true,
+          min: 1
+        }
       }
     },
     {}

@@ -3,8 +3,27 @@ module.exports = (sequelize, DataTypes) => {
   const Form = sequelize.define(
     "Form",
     {
-      title: DataTypes.STRING,
-      description: DataTypes.TEXT,
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          isLength: {
+            min: 4,
+            max: 300
+          }
+        }
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        validate: {
+          isLength: {
+            min: 0,
+            max: 600
+          }
+        }
+      },
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE
     },
@@ -17,8 +36,8 @@ module.exports = (sequelize, DataTypes) => {
       as: "Devices",
       foreignKey: "formId",
       otherKey: "deviceId",
-      onDelete: "cascade",
-      hooks: true
+      onDelete: "cascade"
+      // hooks: true
     });
     Form.hasMany(models.Question, {
       foreignKey: "formId",
