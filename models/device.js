@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       as: "Forms",
       foreignKey: "deviceId",
       otherKey: "formId",
-      hooks: true
+      // hooks: true
     });
   };
   return Device;

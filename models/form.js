@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       as: "Devices",
       foreignKey: "formId",
       otherKey: "deviceId",
-      onDelete: "cascade"
+      onDelete: "cascade",
       // hooks: true
     });
     Form.hasMany(models.Question, {

@@ -5,9 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       answer: {
         type: DataTypes.TEXT,
-        allowNull: false,
         validate: {
-          notEmpty: true,
           isLength: {
             min: 5,
             max: 500
