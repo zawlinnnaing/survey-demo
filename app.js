@@ -1,25 +1,26 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-// var cookieParser = require("cookie-parser");
-var session = require("express-session");
-var mysqlSessionStore = require("express-mysql-session");
-var logger = require("morgan");
+let createError = require("http-errors");
+let express = require("express");
+let path = require("path");
+// let cookieParser = require("cookie-parser");
+let session = require("express-session");
+let mysqlSessionStore = require("express-mysql-session");
+let logger = require("morgan");
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var formRouter = require("./routes/forms");
-var deviceRouter = require("./routes/devices");
+let indexRouter = require("./routes/index");
+let usersRouter = require("./routes/users");
+let formRouter = require("./routes/forms");
+let deviceRouter = require("./routes/devices");
+let questionRouter = require("./routes/questions");
 
-var app = express();
-var storeOptions = {
+let app = express();
+let storeOptions = {
   host: process.env.DB_HOST || "localhost",
   port: process.env.DB_PORT || "3306",
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
 };
-var sess = {
+let sess = {
   store: new mysqlSessionStore(storeOptions),
   secret: "234jfs",
   resave: true,
@@ -51,6 +52,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/forms", formRouter);
 app.use("/devices", deviceRouter);
+app.use("/questions", questionRouter);
 
 //Test routes
 app.post("/test-json", (req, res, next) => {

@@ -21,7 +21,8 @@ async function submitAnswer(req, res, next) {
         {
           model: models.Question,
           as: "questions",
-          order: [models.Question, "order", "desc"]
+          order: [models.Question, "order", "desc"],
+          required: false
         }
       ]
     });
