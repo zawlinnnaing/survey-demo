@@ -1,122 +1,122 @@
 let express = require("express");
 let models = require("../models");
-let { listQuestionsTypes, textQuestionTypes } = require("../config/app");
+let {listQuestionsTypes, textQuestionTypes} = require("../config/app");
 let router = express.Router();
-const { Op } = require("sequelize");
+const {Op} = require("sequelize");
 
 router.get("/", (req, res, next) => {
-  res.render("forms/index", { title: "Create a form" });
+    res.render("forms/index", {title: "Create a form"});
 });
 router.post("/", (req, res, next) => {
-  let data = req.body;
+    let data = req.body;
 
-  // console.log(questions);
-  models.Form.create(
-    {
-      title: data.title,
-      description: data.description,
-      questions: data.questions
-    },
-    {
-      include: [
+    // console.log(questions);
+    models.Form.create(
         {
-          association: models.Form.associations.questions,
-          as: "questions",
-          include: [{ model: models.ListItem, as: "listItems" }]
+            title: data.title,
+            description: data.description,
+            questions: data.questions
+        },
+        {
+            include: [
+                {
+                    association: models.Form.associations.questions,
+                    as: "questions",
+                    include: [{model: models.ListItem, as: "listItems"}]
+                }
+            ]
         }
-      ]
-    }
-  )
-    .then(form => {
-      // questions.forEach(element => {
-      //   console.log(element.items);
-      //   form
-      //     .createQuestion({
-      //       question: element.question,
-      //       type: element.type,
-      //       required: element.required,
-      //       order: element.order
-      //     })
-      //     .then(question => {
-      //       // console.log(typeof question);
-      //       if (element.items && listQuestionsTypes.includes(element.type)) {
-      //         console.log(element.items);
-      //         //   // console.log(element);
-      //         //   // question.listItems = element.items;
-      //         //   // question.save();
-      //         element.items.forEach(item => {
-      //           question.createListItem(item);
-      //         });
-      //       }
-      //     })
-      //     .catch(err => {
-      //       console.error(err);
-      //     });
-      // });
-      res.status(200).json({
-        data: form
-      });
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+    )
+        .then(form => {
+            // questions.forEach(element => {
+            //   console.log(element.items);
+            //   form
+            //     .createQuestion({
+            //       question: element.question,
+            //       type: element.type,
+            //       required: element.required,
+            //       order: element.order
+            //     })
+            //     .then(question => {
+            //       // console.log(typeof question);
+            //       if (element.items && listQuestionsTypes.includes(element.type)) {
+            //         console.log(element.items);
+            //         //   // console.log(element);
+            //         //   // question.listItems = element.items;
+            //         //   // question.save();
+            //         element.items.forEach(item => {
+            //           question.createListItem(item);
+            //         });
+            //       }
+            //     })
+            //     .catch(err => {
+            //       console.error(err);
+            //     });
+            // });
+            res.status(200).json({
+                data: form
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({
+                error: err
+            });
+        });
 });
 
 router.delete("/:formId", (req, res, next) => {
-  let id = req.params.formId;
-  models.Form.destroy({
-    where: {
-      id: id
-    }
-  })
-    .then(() => {
-      res.status(200).json({ msg: "Deletion successful" });
+    let id = req.params.formId;
+    models.Form.destroy({
+        where: {
+            id: id
+        }
     })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({
-        msg: "Deletion failed"
-      });
-    });
+        .then(() => {
+            res.status(200).json({msg: "Deletion successful"});
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({
+                msg: "Deletion failed"
+            });
+        });
 });
 
 router.put("/:formId", (req, res, next) => {
-  let data = req.body;
-  let id = req.params.formId;
-  models.Form.findOne({
-    where: {
-      id: req.params.formId
-    },
-    include: [
-      {
-        model: models.Question,
-        as: "questions",
-        include: {
-          model: models.ListItem,
-          as: "listItems"
-        }
-      }
-    ]
-  })
-    .then(form => {
-      form.title = data.title;
-      form.description = data.description;
-      form.save();
-      // let questionIds =
-      data.questions.forEach(element => {
-        form.questions.update(element);
-      });
-      res.end();
+    let data = req.body;
+    let id = req.params.formId;
+    models.Form.findOne({
+        where: {
+            id: req.params.formId
+        },
+        include: [
+            {
+                model: models.Question,
+                as: "questions",
+                include: {
+                    model: models.ListItem,
+                    as: "listItems"
+                }
+            }
+        ]
     })
-    .catch(err => {
-      console.error(err);
-      res.status(422).json({
-        error: err.message
-      });
-    });
+        .then(form => {
+            form.title = data.title;
+            form.description = data.description;
+            form.save();
+            // let questionIds =
+            data.questions.forEach(element => {
+                form.questions.update(element);
+            });
+            res.end();
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(422).json({
+                error: err.message
+            });
+        });
 });
 
 // router.post("/:formId/text-questions", (req, res, next) => {
@@ -148,159 +148,119 @@ router.put("/:formId", (req, res, next) => {
 // });
 
 router.post("/:formId/answers", async (req, res, next) => {
-  let data = req.body;
-  let t = await models.sequelize.transaction();
-  models.Form.findOne({
-    where: {
-      id: req.params.formId
-    },
-    transaction: t,
-    include: [
-      {
-        model: models.Device,
-        as: "Devices",
-        required: false,
-        attributes: ["sessionId"]
-        // where: {
-        //   sessionId: {
-        //     [Op.eq]: String(req.session.id)
-        //   }
-        // }
-      },
-      {
-        model: models.Question,
-        as: "questions",
-        order: [models.Question, "order", "desc"]
-      }
-    ]
-  })
-    .then(form => {
-      form.Devices.forEach(device => {
-        if (String(device.sessionId) == String(req.session.id)) {
-          throw new Error("Survey already submitted.");
-        }
-      });
-      models.Device.findOrCreate({
-        where: {
-          sessionId: req.session.id
-        },
-        transaction: t
-      })
-        .then(([device, created]) => {
-          form.addDevice(device, {
-            through: {
-              status: "completed"
-            }
-          });
-        })
-        .catch(err => {
-          console.error(err);
-          throw new Error(err.message);
-        });
-      let questionIds = data.map(ele => {
-        return ele.questionId;
-      });
-      if (
-        JSON.stringify(questionIds) !==
-        JSON.stringify(form.questions.map(ele => ele.id))
-      ) {
-        throw new Error("Invalid question contained");
-      }
-      data.forEach(element => {
-        models.Question.findOne({
-          where: {
-            id: element.questionId
-          }
-        })
-          .then(question => {
-            console.log(
-              "is list question ? ",
-              listQuestionsTypes.includes(question.type),
-              " No List answers",
-              element.listAnswers == undefined ||
-                element.listAnswers == null ||
-                element.listAnswers.length <= 0,
-              "Question id",
-              element.questionId
-            );
-            if (question.required) {
-              if (
-                textQuestionTypes.includes(question.type) &&
-                (element.textAnswer == undefined ||
-                  element.textAnswer == null ||
-                  element.textAnswer == "")
-              ) {
-                // res.status(403).json("Invalid answer");
-                console.log("In text answer invalid");
-                throw new Error("Invalid Text answer");
-              } else if (
-                listQuestionsTypes.includes(question.type) &&
-                (element.listAnswers == undefined ||
-                  element.listAnswers == null ||
-                  element.listAnswers.length <= 0)
-              ) {
-                console.log("in list answers invalid");
-                throw new Error("Invalid List answers");
-              }
-            }
-            if (
-              textQuestionTypes.includes(question.type) &&
-              element.textAnswer != ""
-            ) {
-              question.createAnswer(
+    let data = req.body;
+    models.sequelize.transaction().then(async t => {
+        let form = await models.Form.findOne({
+            where: {
+                id: req.params.formId
+            },
+            transaction: t,
+            include: [
                 {
-                  answer: element.textAnswer
+                    model: models.Device,
+                    as: "Devices",
+                    required: false,
+                    attributes: ["sessionId"]
                 },
                 {
-                  transaction: t
+                    model: models.Question,
+                    as: "questions",
+                    order: [models.Question, "order", "desc"]
                 }
-              );
+            ]
+        });
+        form.Devices.forEach(device => {
+            if (String(device.sessionId) == String(req.session.id)) {
+                throw new Error("Survey already submitted.");
+            }
+        });
+        let device = await models.Device.findOrCreate({
+            where: {
+                sessionId: req.session.id
+            },
+            transaction: t
+        });
+        form.addDevice(device, {
+            through: {
+                status: "completed"
+            }
+        });
+        let questionIds = data.map(ele => {
+            return ele.questionId;
+        });
+        if (
+            JSON.stringify(questionIds) !==
+            JSON.stringify(form.questions.map(ele => ele.id))
+        ) {
+            throw new Error("Invalid question contained");
+        }
+        for (let i = 0; i < data.length; i++) {
+            let question = await models.Question.findOne({
+                where: {
+                    id: data[i].questionId
+                }
+            });
+            if (question.required) {
+                if (
+                    textQuestionTypes.includes(question.type) &&
+                    (data[i].textAnswer === undefined ||
+                        data[i].textAnswer == null ||
+                        String(data[i].textAnswer )=== "")
+                ) {
+                    // res.status(403).json("Invalid answer");
+                    console.log("In text answer invalid");
+                    throw new Error("Invalid Text answer");
+                } else if (
+                    listQuestionsTypes.includes(question.type) &&
+                    (data[i].listAnswers === undefined ||
+                        data[i].listAnswers === null ||
+                        data[i].listAnswers.length <= 0)
+                ) {
+                    console.log("in list answers invalid");
+                    throw new Error("Invalid List answers");
+                }
             }
             if (
-              listQuestionsTypes.includes(question.type) &&
-              element.listAnswers.length >= 0
+                textQuestionTypes.includes(question.type) &&
+                String(data[i].textAnswer) !== ""
             ) {
-              question
-                .createListAnswer(
-                  {
-                    createdAt: new Date(),
-                    updateAt: new Date()
-                  },
-                  { transaction: t }
-                )
-                .then(listAnswerModel => {
-                  element.listAnswers.forEach(ele => {
-                    models.ListItem.findOne({
-                      where: {
-                        id: ele.listItemId
-                      }
-                    })
-                      .then(listItem => {
-                        listAnswerModel.addItem(listItem);
-                      })
-                      .catch(err => {
-                        throw new Error(err.message);
-                      });
-                  });
-                })
-                .catch(err => {
-                  throw new Error(err.message);
-                });
+                question.createAnswer(
+                    {
+                        answer: data[i].textAnswer
+                    },
+                    {
+                        transaction: t
+                    }
+                );
             }
-          })
-          .catch(err => {
-            throw new Error(err.message);
-          });
-      });
-      res.status(200).json({
-        msg: "Answers submitted successfully"
-      });
+            if (
+                listQuestionsTypes.includes(question.type) &&
+                data[i].listAnswers.length >= 0
+            ) {
+                let listAnswerModel = await question.createAnswer({
+                    createdAt: new Date()
+                }, {transaction: t});
+                for (let j = 0; j < data[i].listAnswers.length; j++) {
+                    let listItem = await models.listItem.findOne({
+                        where: {
+                            id: data[i].listAnswers[j].listItemId
+                        }
+                    });
+                    listAnswerModel.addItem(listItem);
+                }
+            }
+
+        }
+        res.status(200).json({
+            msg: "Answers submitted successfully"
+        })
+
     })
-    .catch(err => {
-      res.status(422).json({
-        error: err.message
-      });
-    });
+        .catch(err => {
+            next(err);
+        });
+
 });
+
 
 module.exports = router;
