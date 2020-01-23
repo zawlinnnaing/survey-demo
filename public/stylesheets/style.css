@@ -38,6 +38,9 @@ button {
 .question-footer {
   color: #f44336;
   padding: 1rem 2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
 
 div.individual-question {
