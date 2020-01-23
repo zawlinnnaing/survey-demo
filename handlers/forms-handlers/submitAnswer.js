@@ -75,16 +75,13 @@ async function submitAnswer(req, res, next) {
             data[i].listAnswers === null ||
             data[i].listAnswers.length <= 0)
         ) {
-          throw new Error("Invalid List answers");
+          throw new Error("Invalid List answers at questionId " + question.id);
         }
       }
-      if (
-        textQuestionTypes.includes(question.type) &&
-        String(data[i].textAnswer) !== ""
-      ) {
+      if (textQuestionTypes.includes(question.type)) {
         await question.createAnswer(
           {
-            answer: data[i].textAnswer
+            answer: String(data[i].textAnswer) ? String(data[i].textAnswer) : ""
           },
           {
             transaction: t

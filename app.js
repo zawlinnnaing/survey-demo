@@ -11,6 +11,7 @@ let usersRouter = require("./routes/users");
 let formRouter = require("./routes/forms");
 let deviceRouter = require("./routes/devices");
 let questionRouter = require("./routes/questions");
+let analyticsRouter = require("./routes/analytics");
 
 let app = express();
 let storeOptions = {
@@ -53,6 +54,7 @@ app.use("/users", usersRouter);
 app.use("/forms", formRouter);
 app.use("/devices", deviceRouter);
 app.use("/questions", questionRouter);
+app.use("/analytics", analyticsRouter);
 
 //Test routes
 app.post("/test-json", (req, res, next) => {
