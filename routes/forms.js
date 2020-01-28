@@ -3,19 +3,18 @@ let models = require("../models");
 let router = express.Router();
 let submitAnswerHandler = require("../handlers/forms-handlers/submitAnswer");
 let updateFormHandler = require("../handlers/forms-handlers/updateForm");
-const deletFormHandler = require("../handlers/forms-handlers/deleteForm");
+const deleteFormHandler = require("../handlers/forms-handlers/deleteForm");
 const showFormHandler = require("../handlers/forms-handlers/showForm");
+const getFormsHandler = require("../handlers/forms-handlers/getForms");
 
-router.get("/", (req, res, next) => {
-  res.render("forms/index", { title: "Create a form" });
-});
+router.get("/", getFormsHandler);
 
 router.get("/:formId", (req, res, next) => {
   showFormHandler(req, res, next);
 });
 
 router.post("/", (req, res, next) => {
-  let data = req.body;
+  let { data } = req.body;
   models.Form.create(
     {
       title: data.title,
@@ -71,7 +70,7 @@ router.post("/", (req, res, next) => {
 });
 
 router.delete("/:formId", (req, res, next) => {
-  deletFormHandler(req, res, next);
+  deleteFormHandler(req, res, next);
 });
 
 router.put("/:formId", async (req, res, next) => {

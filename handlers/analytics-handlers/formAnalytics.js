@@ -34,17 +34,8 @@ module.exports = async (req, res, next) => {
         }
       ]
     });
-    // console.log(typeof report);
-    // res.attachment("report.xlsx");
-    // res.sendFile(report);
-    // res.setHeader("Content-Type", "application/vnd.openxmlformats");
-    // res.setHeader(
-    //   "Content-Disposition",
-    //   "attachment; filename=" + `${form.title}.xlsx`
-    // );
-    // res.end(buildExcel(form));
+
     buildExcel(form, res);
-    // res.end();
   } catch (e) {
     console.error(e);
     res.status(500).json({
@@ -58,6 +49,7 @@ module.exports = async (req, res, next) => {
  *
  *
  * @param {Form} form
+ * @param {Response}
  */
 async function buildExcel(form, res) {
   let workbook = new x1.Workbook();
@@ -95,7 +87,14 @@ async function buildExcel(form, res) {
   let column = 1;
   Object.keys(dataset[0]).map(key => {
     // Setting question as header for worksheet
-    worksheet.cell(row, column).string(String(key));
+    worksheet
+      .cell(row, column)
+      .string(String(key))
+      .style({
+        font: {
+          size: 24
+        }
+      });
     column++;
   });
   row++, (column = 1);

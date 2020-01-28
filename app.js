@@ -5,6 +5,7 @@ let path = require("path");
 let session = require("express-session");
 let mysqlSessionStore = require("express-mysql-session");
 let logger = require("morgan");
+// let cors = require("cors");
 
 let indexRouter = require("./routes/index");
 let usersRouter = require("./routes/users");
@@ -31,6 +32,13 @@ let sess = {
   }
 };
 
+// let corsOptions = {
+//   origin: "http://localhost:8080",
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   preflightContinue: true
+// };
+
 if (app.get("env") === "production") {
   app.set("trust proxy", 1);
   sess.cookie.secure = true;
@@ -49,6 +57,20 @@ app.use(session(sess));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Routes handlers
+app.use("/*", (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // restrict it to the required domain
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  // Set custom headers for CORS
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin,X-Requested-With,Content-type,Accept,X-Access-Token,X-Key"
+  );
+  if (req.method == "OPTIONS") {
+    res.status(200).end();
+  } else {
+    next();
+  }
+});
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/forms", formRouter);
