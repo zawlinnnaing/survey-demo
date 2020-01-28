@@ -34,7 +34,7 @@ module.exports = async (req, res, next) => {
         }
       ]
     });
-
+    console.log("Form model", form);
     buildExcel(form, res);
   } catch (e) {
     console.error(e);
@@ -51,12 +51,12 @@ module.exports = async (req, res, next) => {
  * @param {Form} form
  * @param {Response}
  */
-async function buildExcel(form, res) {
+function buildExcel(form, res) {
   let workbook = new x1.Workbook();
   let worksheet = workbook.addWorksheet(String(form.title), {
     sheetFormat: {}
   });
-  let style = workbook.createStyle({
+  workbook.createStyle({
     font: {
       color: "#FFFFFF",
       size: 12
@@ -78,10 +78,8 @@ async function buildExcel(form, res) {
     }
   });
 
-  // console.log(questionsAnswers);
-
   let dataset = mergedArray(questionsAnswers);
-  console.log(dataset);
+  console.log("Dataset", dataset);
 
   let row = 1;
   let column = 1;
