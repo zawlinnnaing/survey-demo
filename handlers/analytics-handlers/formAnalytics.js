@@ -1,39 +1,12 @@
-let models = require("../../models");
-// const excel = require("node-excel-export");
 const x1 = require("excel4node");
 const { listQuestionsTypes, textQuestionTypes } = require("../../config/app");
 const fs = require("fs");
+const getForm = require("./getForm");
 
 module.exports = async (req, res, next) => {
   let formId = req.params.formId;
   try {
-    let form = await models.Form.findByPk(formId, {
-      include: [
-        {
-          model: models.Question,
-          as: "questions",
-          attributes: ["id", "question", "type"],
-          include: [
-            {
-              model: models.ListAnswer,
-              as: "listAnswers",
-              attributes: ["id"],
-              include: [
-                {
-                  model: models.ListItem,
-                  as: "Items",
-                  attributes: ["id", "itemName"]
-                }
-              ]
-            },
-            {
-              model: models.TextAnswer,
-              as: "answers"
-            }
-          ]
-        }
-      ]
-    });
+    let form = await getForm(formId);
     console.log("Form model", form);
     buildExcel(form, res);
   } catch (e) {

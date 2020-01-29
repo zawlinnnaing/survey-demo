@@ -62,20 +62,23 @@ async function submitAnswer(req, res, next) {
         transaction: t
       });
       if (question.required) {
+        // If question is required
         if (
           textQuestionTypes.includes(question.type) &&
           (data[i].textAnswer === undefined ||
             data[i].textAnswer === null ||
             String(data[i].textAnswer) === "")
         ) {
-          throw new Error("Invalid Text answer");
+          throw new Error("Invalid Text answer at ", question.question );
         } else if (
           listQuestionsTypes.includes(question.type) &&
           (data[i].listAnswers === undefined ||
             data[i].listAnswers === null ||
             data[i].listAnswers.length <= 0)
         ) {
-          throw new Error("Invalid List answers at questionId " + question.id);
+          throw new Error(
+            "Invalid List answers at " + question.question
+          );
         }
       }
       if (textQuestionTypes.includes(question.type)) {
@@ -117,7 +120,9 @@ async function submitAnswer(req, res, next) {
     });
   } catch (err) {
     await t.rollback();
-    next(err);
+    res.status(400).json({
+      message: err.message
+    });
   }
 }
 

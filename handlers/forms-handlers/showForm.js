@@ -7,15 +7,17 @@ module.exports = async (req, res, next) => {
         {
           model: models.Question,
           as: "questions",
-          order: [models.Question, "order", "asc"],
+          separate: true,
           attributes: {
             exclude: ["formId", "createdAt", "updatedAt"]
           },
+          order: [["order", "ASC"]],
           include: [
             {
               model: models.ListItem,
               as: "listItems",
-              order: [models.ListItem, "order", "asc"],
+              separate: true,
+              order: [["order", "ASC"]],
               attributes: {
                 exclude: ["questionId", "createdAt", "updatedAt"]
               }

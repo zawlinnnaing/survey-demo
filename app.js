@@ -65,6 +65,7 @@ app.use("/*", (req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin,X-Requested-With,Content-type,Accept,X-Access-Token,X-Key"
   );
+  res.header("Access-Control-Allow-Credentials", true);
   if (req.method == "OPTIONS") {
     res.status(200).end();
   } else {
