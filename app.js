@@ -58,7 +58,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Routes handlers
 app.use("/*", (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:8080"); // restrict it to the required domain
+  res.header(
+    "Access-Control-Allow-Origin",
+    "http://localhost:8080 http://128.199.228.176/"
+  ); // restrict it to the required domain
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   // Set custom headers for CORS
   res.header(
