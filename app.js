@@ -75,12 +75,12 @@ app.use("/*", (req, res, next) => {
     next();
   }
 });
-app.use("/api", indexRouter);
-app.use("/api/users", usersRouter);
-app.use("/api/forms", formRouter);
-app.use("/api/devices", deviceRouter);
-app.use("/api/questions", questionRouter);
-app.use("/api/analytics", analyticsRouter);
+app.use("/", indexRouter);
+app.use("/users", usersRouter);
+app.use("/forms", formRouter);
+app.use("/devices", deviceRouter);
+app.use("/questions", questionRouter);
+app.use("/analytics", analyticsRouter);
 
 //Test routes
 app.post("/test-json", (req, res, next) => {
