@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           notEmpty: true,
           isLength: {
-            min: 2,
+            min: 0,
             max: 200
           }
         }
