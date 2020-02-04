@@ -32,13 +32,6 @@ let sess = {
   }
 };
 
-// let corsOptions = {
-//   origin: "http://localhost:8080",
-//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//   allowedHeaders: ["Content-Type", "Authorization"],
-//   preflightContinue: true
-// };
-
 if (app.get("env") === "production") {
   app.set("trust proxy", 1);
   sess.cookie.secure = true;
@@ -50,18 +43,10 @@ app.set("view engine", "pug");
 
 //Setting up middlewares
 app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
-app.use(session(sess));
-app.use(express.static(path.join(__dirname, "public")));
-
-// Routes handlers
-app.use("/*", (req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "http://localhost:8080 http://128.199.228.176/"
-  ); // restrict it to the required domain
+// CORS section
+app.use((req, res, next) => {
+  console.log("from here");
+  res.header("Access-Control-Allow-Origin", process.env.CORS_SOURCE); // restrict it to the required domain
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   // Set custom headers for CORS
   res.header(
@@ -75,6 +60,13 @@ app.use("/*", (req, res, next) => {
     next();
   }
 });
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+// app.use(cookieParser());
+app.use(session(sess));
+app.use(express.static(path.join(__dirname, "public")));
+
+// Routes handler
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/forms", formRouter);
