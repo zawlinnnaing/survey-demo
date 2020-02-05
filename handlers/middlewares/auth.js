@@ -5,9 +5,7 @@ module.exports = async (req, res, next) => {
   try {
     if (!req.header("Authorization")) throw new Error("No auth header");
     let token = req.header("Authorization").replace("Bearer ", "");
-    console.log("Authorization token ", token);
     const data = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("decoded data ;", data);
     const admin = await models.Admin.findOne({
       where: {
         id: data.id,

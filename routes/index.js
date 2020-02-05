@@ -1,6 +1,7 @@
 let express = require("express");
 let router = express.Router();
 const models = require("../models");
+const authMiddleware = require("../handlers/middlewares/auth");
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
@@ -55,4 +56,18 @@ router.post("/register", async (req, res, next) => {
     res.status(400).json(error);
   }
 });
+
+router.get("/logout", authMiddleware, async (req, res, next) => {
+  try {
+    req.admin.accessToken = "";
+    await req.admin.save();
+    res.status(200).json({
+      message: "Logout successfully"
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json(e);
+  }
+});
+
 module.exports = router;
