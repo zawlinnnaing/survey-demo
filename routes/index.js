@@ -9,7 +9,7 @@ router.get("/", function(req, res, next) {
 });
 
 router.post("/login", async (req, res, next) => {
-  let { data } = req.body;
+  let data = req.body;
   try {
     let admin = await models.Admin.findByCredentials(data.email, data.password);
     if (!admin) throw new Error("Entity not found.");

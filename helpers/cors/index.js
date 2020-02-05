@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
   // Set custom headers for CORS
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin,X-Requested-With,Content-type,Accept,X-Access-Token,X-Key"
+    "Origin,X-Requested-With,Content-type,Accept,X-Access-Token,X-Key,Authorization"
   );
   res.header("Access-Control-Allow-Credentials", true);
   if (req.method == "OPTIONS") {
