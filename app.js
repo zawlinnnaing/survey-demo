@@ -5,10 +5,10 @@ let path = require("path");
 let session = require("express-session");
 let mysqlSessionStore = require("express-mysql-session");
 let logger = require("morgan");
-// let cors = require("cors");
+let cors = require("./helpers/cors");
 
 let indexRouter = require("./routes/index");
-let usersRouter = require("./routes/users");
+// let usersRouter = require("./routes/users");
 let formRouter = require("./routes/forms");
 let deviceRouter = require("./routes/devices");
 let questionRouter = require("./routes/questions");
@@ -44,22 +44,8 @@ app.set("view engine", "pug");
 //Setting up middlewares
 app.use(logger("dev"));
 // CORS section
-app.use((req, res, next) => {
-  console.log("from here");
-  res.header("Access-Control-Allow-Origin", process.env.CORS_SOURCE); // restrict it to the required domain
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  // Set custom headers for CORS
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin,X-Requested-With,Content-type,Accept,X-Access-Token,X-Key"
-  );
-  res.header("Access-Control-Allow-Credentials", true);
-  if (req.method == "OPTIONS") {
-    res.status(200).end();
-  } else {
-    next();
-  }
-});
+
+app.use(cors);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser());
@@ -68,17 +54,11 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Routes handler
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+// app.use("/users", usersRouter);
 app.use("/forms", formRouter);
 app.use("/devices", deviceRouter);
 app.use("/questions", questionRouter);
 app.use("/analytics", analyticsRouter);
-
-//Test routes
-app.post("/test-json", (req, res, next) => {
-  let json_body = req.body.test_json;
-  res.status(200).json(json_body);
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,3 +1,5 @@
+const models = require("../../models");
+
 module.exports = (req, res, next) => {
   models.Form.destroy({
     where: {

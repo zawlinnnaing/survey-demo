@@ -6,6 +6,7 @@ let updateFormHandler = require("../handlers/forms-handlers/updateForm");
 const deleteFormHandler = require("../handlers/forms-handlers/deleteForm");
 const showFormHandler = require("../handlers/forms-handlers/showForm");
 const getFormsHandler = require("../handlers/forms-handlers/getForms");
+const authMiddleware = require("../handlers/middlewares/auth");
 
 router.get("/", getFormsHandler);
 
@@ -13,63 +14,39 @@ router.get("/:formId", (req, res, next) => {
   showFormHandler(req, res, next);
 });
 
-router.post("/", (req, res, next) => {
+router.post("/", async (req, res, next) => {
   let { data } = req.body;
-  models.Form.create(
-    {
-      title: data.title,
-      description: data.description,
-      questions: data.questions
-    },
-    {
-      include: [
-        {
-          association: models.Form.associations.questions,
-          as: "questions",
-          include: [{ model: models.ListItem, as: "listItems" }]
-        }
-      ]
-    }
-  )
-    .then(form => {
-      // questions.forEach(element => {
-      //   console.log(element.items);
-      //   form
-      //     .createQuestion({
-      //       question: element.question,
-      //       type: element.type,
-      //       required: element.required,
-      //       order: element.order
-      //     })
-      //     .then(question => {
-      //       // console.log(typeof question);
-      //       if (element.items && listQuestionsTypes.includes(element.type)) {
-      //         console.log(element.items);
-      //         //   // console.log(element);
-      //         //   // question.listItems = element.items;
-      //         //   // question.save();
-      //         element.items.forEach(item => {
-      //           question.createListItem(item);
-      //         });
-      //       }
-      //     })
-      //     .catch(err => {
-      //       console.error(err);
-      //     });
-      // });
-      res.status(200).json({
-        data: form
-      });
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({
-        error: err
-      });
+  try {
+    const t = await models.sequelize.transaction();
+    let form = await models.Form.create(
+      {
+        title: data.title,
+        description: data.description,
+        questions: data.questions
+      },
+      {
+        include: [
+          {
+            association: models.Form.associations.questions,
+            as: "questions",
+            include: [{ model: models.ListItem, as: "listItems" }]
+          }
+        ],
+        transaction: t
+      }
+    );
+    await t.commit();
+    res.status(200).json({
+      data: form
     });
+  } catch (e) {
+    await t.rollback();
+    console.error(e);
+    res.status(500).json(e);
+  }
 });
 
-router.delete("/:formId", (req, res, next) => {
+router.delete("/:formId", authMiddleware, (req, res, next) => {
   deleteFormHandler(req, res, next);
 });
 
