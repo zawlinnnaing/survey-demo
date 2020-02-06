@@ -58,7 +58,7 @@ app.use("/", indexRouter);
 app.use("/forms", formRouter);
 app.use("/devices", deviceRouter);
 app.use("/questions", questionRouter);
-app.use("/analytics", analyticsRouter);
+app.use("/charts", analyticsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
