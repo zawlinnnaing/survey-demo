@@ -27,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE
     },
-    {}
+    {
+      paranoid: true
+    }
   );
   Form.associate = function(models) {
     // associations can be defined here
@@ -35,14 +37,12 @@ module.exports = (sequelize, DataTypes) => {
       through: "FormDevices",
       as: "Devices",
       foreignKey: "formId",
-      otherKey: "deviceId",
-      onDelete: "cascade",
+      otherKey: "deviceId"
       // hooks: true
     });
     Form.hasMany(models.Question, {
       foreignKey: "formId",
-      as: "questions",
-      onDelete: "cascade"
+      as: "questions"
     });
   };
   return Form;

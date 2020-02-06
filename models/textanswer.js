@@ -21,13 +21,17 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notEmptyTextRange() {
           console.log("Quesiton answer", this.answer);
-          if (String(this.answer) != ""  && (this.answer < 5 || this.answer > 300)) {
+          if (
+            String(this.answer) != "" &&
+            (this.answer < 5 || this.answer > 300)
+          ) {
             throw new Error(
               "Invalid answer length at answer id " + this.questionId
             );
           }
         }
-      }
+      },
+      paranoid: true
     }
   );
   TextAnswer.associate = function(models) {

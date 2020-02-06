@@ -14,7 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE
     },
-    {}
+    {
+      paranoid: true
+    }
   );
   Device.associate = function(models) {
     // associations can be defined here
@@ -22,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       through: "FormDevices",
       as: "Forms",
       foreignKey: "deviceId",
-      otherKey: "formId",
+      otherKey: "formId"
       // hooks: true
     });
   };

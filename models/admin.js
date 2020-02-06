@@ -51,7 +51,9 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    {}
+    {
+      paranoid: true
+    }
   );
 
   Admin.generateAccessToken = async (instance, t) => {

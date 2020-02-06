@@ -30,19 +30,19 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    {}
+    {
+      paranoid: true
+    }
   );
   ListItem.associate = function(models) {
     // associations can be defined here
     ListItem.belongsTo(models.Question, {
-      foreignKey: "listQuestionId",
-      onDelete: "cascade"
+      foreignKey: "listQuestionId"
     });
     ListItem.belongsToMany(models.ListAnswer, {
       foreignKey: "listItemId",
       through: "ListAnswerItem",
-      as: "Answers",
-      onDelete: "cascade"
+      as: "Answers"
     });
   };
   return ListItem;

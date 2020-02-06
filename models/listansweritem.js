@@ -18,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    {}
+    {
+      paranoid: true
+    }
   );
   ListAnswerItem.associate = function(models) {
     // associations can be defined here

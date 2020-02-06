@@ -29,19 +29,19 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    {}
+    {
+      paranoid: true
+    }
   );
   Question.associate = function(models) {
     // associations can be defined here
     Question.hasMany(models.TextAnswer, {
       foreignKey: "questionId",
-      as: "answers",
-      onDelete: "cascade"
+      as: "answers"
     });
     Question.hasMany(models.ListItem, {
       foreignKey: "listQuestionId",
-      as: "listItems",
-      onDelete: "cascade"
+      as: "listItems"
     });
 
     Question.hasMany(models.ListAnswer, {
@@ -49,13 +49,11 @@ module.exports = (sequelize, DataTypes) => {
       as: {
         singular: "listAnswer",
         plural: "listAnswers"
-      },
-      onDelete: "cascade"
+      }
     });
     Question.belongsTo(models.Form, {
       as: "form",
-      foreignKey: "formId",
-      onDelete: "cascade"
+      foreignKey: "formId"
     });
   };
   return Question;
