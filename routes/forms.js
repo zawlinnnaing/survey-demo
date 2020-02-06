@@ -8,7 +8,7 @@ const showFormHandler = require("../handlers/forms-handlers/showForm");
 const getFormsHandler = require("../handlers/forms-handlers/getForms");
 const authMiddleware = require("../handlers/middlewares/auth");
 
-router.get("/", getFormsHandler);
+router.get("/", authMiddleware, getFormsHandler);
 
 router.get("/:formId", (req, res, next) => {
   showFormHandler(req, res, next);
