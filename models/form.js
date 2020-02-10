@@ -44,6 +44,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "formId",
       as: "questions"
     });
+    Form.hasMany(models.FormAccessToken, {
+      foreignKey: "formId",
+      as: "AccessTokens",
+      sourceKey: "id"
+    });
   };
   return Form;
 };

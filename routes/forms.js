@@ -6,13 +6,40 @@ let updateFormHandler = require("../handlers/forms-handlers/updateForm");
 const deleteFormHandler = require("../handlers/forms-handlers/deleteForm");
 const showFormHandler = require("../handlers/forms-handlers/showForm");
 const getFormsHandler = require("../handlers/forms-handlers/getForms");
+const getAnswerLinksHandler = require("../handlers/forms-handlers/getAnswerLinks");
 const authMiddleware = require("../handlers/middlewares/auth");
+
+const { validateGenerateAnswerTokens } = require("./validators/FormValidator");
 
 router.get("/", authMiddleware, getFormsHandler);
 
 router.get("/:formId", (req, res, next) => {
   showFormHandler(req, res, next);
 });
+
+// Generate tokens
+router.post(
+  "/:formId/tokens",
+  authMiddleware,
+  validateGenerateAnswerTokens,
+  async (req, res, next) => {
+    try {
+      let formId = req.params.formId;
+      let request = req.body;
+      let form = await models.Form.findByPk(formId);
+      let tokens = await models.FormAccessToken.generateTokens(
+        form,
+        Number(request.count)
+      );
+      res.status(200).json({
+        tokens
+      });
+    } catch (e) {
+      console.error(e);
+      next(e);
+    }
+  }
+);
 
 router.post("/", async (req, res, next) => {
   let { data } = req.body;
@@ -54,35 +81,9 @@ router.put("/:formId", async (req, res, next) => {
   await updateFormHandler(req, res, next);
 });
 
-// router.post("/:formId/text-questions", (req, res, next) => {
-//   models.Form.findOne({
-//     where: {
-//       id: req.params.formId
-//     }
-//   })
-//     .then(form => {
-//       form
-//         .createTextQuestion({
-//           question: req.body.question,
-//           type: req.body.questionType,
-//           required: Boolean(req.body.required),
-//           order: req.body.order
-//         })
-//         .then(() => {
-//           res.status(200).json({
-//             message: "Text question created successfully."
-//           });
-//         });
-//     })
-//     .catch(err => {
-//       console.error(err);
-//       res.status(500).json({
-//         error: err
-//       });
-//     });
-// });
+router.get("/:formId/links", authMiddleware, getAnswerLinksHandler);
 
-router.post("/:formId/answers", (req, res, next) => {
+router.post("/:formId/answers/:token", (req, res, next) => {
   submitAnswerHandler(req, res, next);
 });
 

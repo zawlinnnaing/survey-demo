@@ -8,7 +8,7 @@
  */
 function checkMatchRecords(inputIds, dbModel, key = "questions") {
   if (!dbModel.hasOwnProperty(key)) {
-    throw new Error("Form does not has any questions");
+    throw "Form does not has any questions";
   }
   console.log(
     "IDs from db",
@@ -19,7 +19,7 @@ function checkMatchRecords(inputIds, dbModel, key = "questions") {
     JSON.stringify(inputIds.sort()) !==
     JSON.stringify(dbModel[key].map(ele => ele.id).sort())
   ) {
-    throw new Error(`Invalid  ${key} contained`);
+    throw `Invalid  ${key} contained`;
   }
 }
 

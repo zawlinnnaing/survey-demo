@@ -4,20 +4,25 @@ const { checkMatchRecords } = require("../../helpers/helpers");
 
 async function submitAnswer(req, res, next) {
   let data = req.body;
+  let formAccessToken = req.params.token;
   const t = await models.sequelize.transaction();
   try {
+    let tokenModel = await models.FormAccessToken.findOne({
+      where: {
+        formId: req.params.formId,
+        token: formAccessToken,
+        answered: false
+      }
+    });
+    if (!tokenModel) {
+      throw "Answer already submitted.";
+    }
     let form = await models.Form.findOne({
       where: {
         id: req.params.formId
       },
       transaction: t,
       include: [
-        {
-          model: models.Device,
-          as: "Devices",
-          required: false,
-          attributes: ["sessionId"]
-        },
         {
           model: models.Question,
           as: "questions",
@@ -26,27 +31,8 @@ async function submitAnswer(req, res, next) {
         }
       ]
     });
-    form.Devices.forEach(device => {
-      if (String(device.sessionId) === String(req.session.id)) {
-        throw new Error("Survey already submitted.");
-      }
-    });
-    let device = await models.Device.findOrCreate({
-      where: {
-        sessionId: req.session.id
-      },
-      defaults: {
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      transaction: t
-    });
-    await form.addDevice(device[0], {
-      through: {
-        status: "completed",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
+    tokenModel.answered = true;
+    await tokenModel.save({
       transaction: t
     });
     let questionIds = data.map(ele => {
@@ -69,16 +55,14 @@ async function submitAnswer(req, res, next) {
             data[i].textAnswer === null ||
             String(data[i].textAnswer) === "")
         ) {
-          throw new Error("Invalid Text answer at ", question.question );
+          throw "Invalid Text answer at " + question.question;
         } else if (
           listQuestionsTypes.includes(question.type) &&
           (data[i].listAnswers === undefined ||
             data[i].listAnswers === null ||
             data[i].listAnswers.length <= 0)
         ) {
-          throw new Error(
-            "Invalid List answers at " + question.question
-          );
+          throw "Invalid List answers at " + question.question;
         }
       }
       if (textQuestionTypes.includes(question.type)) {
@@ -119,9 +103,10 @@ async function submitAnswer(req, res, next) {
       msg: "Answers submitted successfully"
     });
   } catch (err) {
+    console.error(err);
     await t.rollback();
     res.status(400).json({
-      message: err.message
+      message: err
     });
   }
 }
